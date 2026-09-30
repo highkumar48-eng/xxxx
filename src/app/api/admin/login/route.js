@@ -1,15 +1,11 @@
 import { timingSafeEqual, createHash } from "node:crypto";
 import { cookies } from "next/headers";
 import { COOKIE, signToken } from "@/lib/auth";
-import { fail, handle } from "@/lib/api";
+import { fail, handle, trustedOrigin } from "@/lib/api";
 import { serverClient, configured } from "@/lib/supabase-server";
 export async function POST(request) {
   return handle(async () => {
-    const origin = request.headers.get("origin");
-    if (
-      !origin ||
-      origin !== new URL(process.env.NEXT_PUBLIC_APP_URL || request.url).origin
-    )
+    if (!trustedOrigin(request))
       return fail("Invalid origin", 403);
     if (!process.env.ADMIN_PASSWORD || !process.env.ADMIN_JWT_SECRET)
       return fail(
@@ -18,9 +14,11 @@ export async function POST(request) {
       );
     if (!configured())
       return fail("Connect Supabase and run setup before signing in.", 503);
-    const forwarded = process.env.VERCEL
-      ? request.headers.get("x-vercel-forwarded-for")
-      : "local";
+    const forwarded =
+      request.headers.get("x-nf-client-connection-ip") ||
+      request.headers.get("x-vercel-forwarded-for") ||
+      request.headers.get("x-forwarded-for") ||
+      "local";
     const key = createHash("sha256")
       .update((forwarded || "unknown").split(",")[0])
       .digest("hex");

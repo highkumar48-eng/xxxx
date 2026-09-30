@@ -150,9 +150,13 @@ export default async function Home({ searchParams }) {
       <footer className="footer">
         <span className="footer-brand">VidShare.</span>
         <span>A world of moments. Yours to explore.</span>
-        <Link href="/admin">
-          Made for sharing <ArrowUpRight size={13} />
-        </Link>
+        <span className="footer-links">
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/contact">Contact</Link>
+          <Link href="/admin">
+            Creator studio <ArrowUpRight size={13} />
+          </Link>
+        </span>
       </footer>
     </div>
   );

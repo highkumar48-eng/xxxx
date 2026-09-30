@@ -4,13 +4,27 @@ import { COOKIE, verifyToken } from "./auth";
 export function fail(message, status = 400) {
   return Response.json({ error: message }, { status });
 }
-export async function authorized(request) {
+export function trustedOrigin(request) {
   const origin = request.headers.get("origin");
-  if (
-    !origin ||
-    origin !== new URL(process.env.NEXT_PUBLIC_APP_URL || request.url).origin
-  )
+  if (!origin) return false;
+  try {
+    const requestOrigin = new URL(request.url).origin;
+    const configuredOrigin = new URL(
+      process.env.NEXT_PUBLIC_APP_URL || request.url,
+    ).origin;
+    if (origin === configuredOrigin) return true;
+    const candidate = new URL(origin);
+    return (
+      process.env.NODE_ENV !== "production" &&
+      candidate.hostname === "localhost" &&
+      candidate.protocol === "http:"
+    ) || (process.env.NODE_ENV !== "production" && origin === requestOrigin);
+  } catch {
     return false;
+  }
+}
+export async function authorized(request) {
+  if (!trustedOrigin(request)) return false;
   return Boolean(await verifyToken((await cookies()).get(COOKIE)?.value));
 }
 export async function handle(fn) {

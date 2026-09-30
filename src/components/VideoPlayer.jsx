@@ -2,13 +2,17 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import AdBanner from "./AdBanner";
 const ReactPlayer = dynamic(() => import("react-player/lazy"), {
   ssr: false,
   loading: () => <div className="player-loading">Loading player…</div>,
 });
 export default function VideoPlayer({ video }) {
   const counted = useRef(false);
+  const breakAt = 60;
+  const shownBreak = useRef(false);
   const [error, setError] = useState(false);
+  const [midroll, setMidroll] = useState(false);
   useEffect(() => {
     if (!counted.current && !video.id.startsWith("demo-")) {
       counted.current = true;
@@ -17,6 +21,15 @@ export default function VideoPlayer({ video }) {
       );
     }
   }, [video.id]);
+  function onProgress(state) {
+    if (!shownBreak.current && state.playedSeconds >= breakAt) {
+      shownBreak.current = true;
+      setMidroll(true);
+    }
+  }
+  function continueWatching() {
+    setMidroll(false);
+  }
   return (
     <div className="player">
       {video.media_type === "image" ? (
@@ -33,8 +46,24 @@ export default function VideoPlayer({ video }) {
           controls
           width="100%"
           height="100%"
+          onProgress={onProgress}
+          progressInterval={1000}
           onError={() => setError(true)}
         />
+      )}
+      {midroll && (
+        <div
+          className="midroll-overlay"
+          role="dialog"
+          aria-label="Advertisement"
+        >
+          <div className="midroll-card">
+            <AdBanner placement="midroll" />
+            <button className="button" onClick={continueWatching}>
+              Continue watching
+            </button>
+          </div>
+        </div>
       )}
       {error && (
         <div className="player-error">

@@ -18,7 +18,7 @@ Open http://localhost:3000. Without Supabase settings, public pages show a clear
 1. Copy `.env.example` to `.env.local`.
 2. Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and the server-only `SUPABASE_SERVICE_ROLE_KEY` from your project API settings.
 3. Set `DATABASE_URL` to your Supabase PostgreSQL connection string (the session pooler connection works on IPv4 networks). URL-encode special characters in its password. This is used only by the setup script; do not expose it in browser variables.
-4. Set a unique `ADMIN_PASSWORD`. If it contains `#`, wrap the complete value in double quotes in `.env.local`. Do not reuse the example password from the PRD.
+4. Set a unique `ADMIN_PASSWORD`. Wrap the complete value in double quotes in `.env.local` whenever it contains `#`, `!`, or other shell punctuation. Avoid `$` in this value because dotenv treats it as variable interpolation. Do not reuse the example password from the PRD.
 5. Generate `ADMIN_JWT_SECRET` with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
 6. Run `npm run setup`. It applies `supabase/schema.sql` and verifies public reads and both storage buckets. Alternatively, execute the SQL manually in the Supabase SQL editor; no database URL is required at runtime.
 7. Restart the app and open `/admin` to sign in.
@@ -34,6 +34,12 @@ Views increment through a server-only RPC. An httpOnly one-hour cookie suppresse
 ## Vercel
 
 Import this directory as a Next.js project. Use `npm run build` and Node.js 22+. Set the environment values from `.env.example` in Vercel, with a strong unique admin password and JWT secret. Set `NEXT_PUBLIC_APP_URL` to the exact HTTPS origin of the deployment (no path), since mutation requests check this origin. Preview deployments need their own matching URL. Run database setup once before using admin sign-in. Never prefix the service role key, database URL, or admin secrets with `NEXT_PUBLIC_`.
+
+## Netlify
+
+The repository includes `netlify.toml` for the Next.js runtime and Node 22. Create a new site from this repository and set the variables from `.env.example` in Netlify's site environment settings. Set `NEXT_PUBLIC_APP_URL` to the exact deployed HTTPS URL before testing sign-in or uploads. `DATABASE_URL` is only needed when you want to re-run `npm run setup`; the running app uses the Supabase URL, anon key, and service role key.
+
+Before applying for advertising, upload original media, add a clear site name and description, verify the privacy/contact pages required by your ad provider, and replace the AdStark placeholders with the approved publisher, client, and slot values. Do not apply with an empty collection or demo-only media.
 
 ## AdStark
 
