@@ -9,8 +9,13 @@ export function trustedOrigin(request) {
   if (!origin) return false;
   try {
     const requestOrigin = new URL(request.url).origin;
+    const appOrigin = process.env.NEXT_PUBLIC_APP_URL || "";
+    const platformOrigin =
+      process.env.DEPLOY_PRIME_URL || process.env.URL || "";
     const configuredOrigin = new URL(
-      process.env.NEXT_PUBLIC_APP_URL || request.url,
+      platformOrigin && /^https?:\/\/localhost(?::\d+)?$/i.test(appOrigin)
+        ? platformOrigin
+        : appOrigin || platformOrigin || request.url,
     ).origin;
     if (origin === configuredOrigin) return true;
     const candidate = new URL(origin);

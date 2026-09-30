@@ -37,7 +37,7 @@ Import this directory as a Next.js project. Use `npm run build` and Node.js 22+.
 
 ## Netlify
 
-The repository includes `netlify.toml` for the Next.js runtime and Node 22. Create a new site from this repository and set the variables from `.env.example` in Netlify's site environment settings. Set `NEXT_PUBLIC_APP_URL` to the exact deployed HTTPS URL before testing sign-in or uploads. `DATABASE_URL` is only needed when you want to re-run `npm run setup`; the running app uses the Supabase URL, anon key, and service role key.
+The repository includes `netlify.toml` for the Next.js runtime and Node 22. Create a new site from this repository and set the variables from `.env.example` in Netlify's site environment settings. Set `NEXT_PUBLIC_APP_URL` to the exact deployed HTTPS URL before testing sign-in or uploads; when it is left at the local default, the app also recognizes Netlify's `DEPLOY_PRIME_URL`/`URL` automatically. `DATABASE_URL` is only needed when you want to re-run `npm run setup`; the running app uses the Supabase URL, anon key, and service role key.
 
 Before applying for advertising, upload original media, add a clear site name and description, verify the privacy/contact pages required by your ad provider, and replace the AdStark placeholders with the approved publisher, client, and slot values. Do not apply with an empty collection or demo-only media.
 
